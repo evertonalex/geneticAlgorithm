@@ -23,7 +23,6 @@ class Individuo():
         self.valores = valores
         self.geracao = geracao
         self.notaAvaliacao = 0
-        self.geracao = geracao
         self.cromossomo = []
 
         for i in range(0,TAMANHOCROMOSSOMO):
