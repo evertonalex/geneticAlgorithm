@@ -8,10 +8,11 @@ import random
 import numpy as np
 import struct
 
-from numba.cuda.tests.cudapy.test_blackscholes import randfloat
+
 
 TAMANHOCROMOSSOMO = 15
-TAMANHOPOPULACAO = 1
+TAMANHOPOPULACAO = 4
+NUMEROGERACOES = 4
 PONTOCORTE=5
 
 class Individuo():
@@ -40,6 +41,23 @@ class Individuo():
 
         self.notaFitness = x1 **2 + x2 **2 + x3 **2
         print("Nota fitness ", self.notaFitness)
+
+    def crossover(self, outroIndividuo):
+        filho1 = outroIndividuo.cromossomo[0:PONTOCORTE] + self.cromossomo[PONTOCORTE:PONTOCORTE+5] + outroIndividuo.cromossomo[PONTOCORTE+5::]
+        filho2 = self.cromossomo[0:PONTOCORTE] + outroIndividuo.cromossomo[PONTOCORTE:PONTOCORTE+5] + self.cromossomo[PONTOCORTE+5::]
+
+        filhos = [
+            Individuo(self.cromossomo, self.geracao + 1),
+            Individuo(self.cromossomo, self.geracao + 1)
+        ]
+
+        filhos[0].cromossomo = filho1
+        filhos[1].cromossomo = filho2
+
+        print("CROMOSSOMO ORIGINAL ", self.cromossomo)
+        print("CROMOSSOMO CROSS ", filho2.cromosso)
+
+
 
 
 class AG():
@@ -77,18 +95,56 @@ class AG():
             # self.populacao.append(Individuo(numeroRandBin))
             # print("cromossomo -> ", self.populacao[i].cromossomo)
 
-    def run(self):
+    def ordenaPopulacao(self):
+        self.populacao = sorted(self.populacao, key=lambda populacao: populacao.notaFitness, reverse=False)
+
+    def somaFtnessIndividuos(self):
+        soma = 0
+        for individuo in self.populacao:
+            soma += individuo.notaFitness
+        return soma
+
+    def roletaSelecionaPai(self, somaFitness):
+        pai = -1
+        valorSorteado = random.randint(0,100) * somaFitness
+        soma = 0
+        i = 0
+        while i < len(self.populacao) and soma < valorSorteado:
+            soma += self.populacao[i].notaFitness
+            pai += 1
+            i += 1
+        return pai
+
+    def run(self, numeroGeracoes):
         # self.populacao.append()
         self.inicializaPopulacao()
         for i in range(len(self.populacao)):
             self.populacao[i].fitness()
+
+        self.ordenaPopulacao()
+
+        print("MELHOR SOLUCAO *** ", self.populacao[0].notaFitness)
+
+        for geracao in range(numeroGeracoes):
+            somaAvaliacoes = self.somaFtnessIndividuos()
+
+            print("SOMA FITNESS ", somaAvaliacoes)
+            novaPopulacao = []
+
+            for individuoGeracao in range(0, numeroGeracoes, 2):
+                pai1 = self.roletaSelecionaPai(somaAvaliacoes)
+                pai2 = self.roletaSelecionaPai(somaAvaliacoes)
+
+        # for geracao in range(tamanhoGeracao):
+
 
 
 
 
 if __name__ == '__main__':
     ag = AG()
-    ag.run()
+    ag.run(NUMEROGERACOES)
+
 
 
 
