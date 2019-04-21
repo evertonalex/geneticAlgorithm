@@ -11,10 +11,12 @@ import struct
 
 
 TAMANHOCROMOSSOMO = 15
-TAMANHOPOPULACAO = 4
+TAMANHOPOPULACAO = 1
 NUMEROGERACOES = 4
 PONTOCORTE=5
 PROBABILIDADEMUTACAO = 0.05
+INF = -5.12
+SUP = 5.12
 
 class Individuo():
     def __init__(self, cromossomo, geracao = 0):
@@ -30,17 +32,23 @@ class Individuo():
         cromossoPicado.append(self.cromossomo[PONTOCORTE:PONTOCORTE+5])
         cromossoPicado.append(self.cromossomo[PONTOCORTE+PONTOCORTE::])
 
+        cromossomoPicadoString = []
+        x = []
         for i in range(len(cromossoPicado)):
             print("parte %s -> %s " % (i, cromossoPicado[i]))
+            cromossomoPicadoString.append(''.join(str(y) for y in cromossoPicado[i]))
+            print("nunConvertido INT ", int(cromossomoPicadoString[i],2))
 
-        x1 = 1+(int(cromossoPicado[0],2))*(2-(-2))/(2**6-1)
-        x2 = 1+(int(cromossoPicado[1],2))*(2-(-2))/(2**6-1)
-        x3 = 1+(int(cromossoPicado[2],2))*(2-(-2))/(2**6-1)
-        print(x1)
-        print(x2)
-        print(x3)
+            x.append(INF+((SUP-INF)/2**5-1)*int(cromossomoPicadoString[i],2))
 
-        self.notaFitness = x1 **2 + x2 **2 + x3 **2
+        # x1 = 1+(int(cromossomoPicadoString[0],2))*(2-(-2))/(2**6-1)
+        # x2 = 1+(int(cromossomoPicadoString[1],2))*(2-(-2))/(2**6-1)
+        # x3 = 1+(int(cromossomoPicadoString[2],2))*(2-(-2))/(2**6-1)
+        print("X--> ", x[0])
+        print("X--> ", x[1])
+        print("X--> ", x[2])
+
+        self.notaFitness = x[0]**2 + x[1]**2 + x[2]**2
         print("Nota fitness ", self.notaFitness)
 
     def crossover(self, outroIndividuo):
@@ -61,15 +69,20 @@ class Individuo():
 
     def mutacao(self, taxaMutacao):
         print("MUTACAO before %s" % self.cromossomo)
-        for i in range(len(self.cromossomo)):
+
+        cromoTemp = self.cromossomo
+
+        for i in range(len(cromoTemp)):
             if random.randint(0,1) < taxaMutacao:
-                print("CROMO TESTE ", self.cromossomo[i])
-                if self.cromossomo[i] == '1':
-                    print("IGUL 1")
-                    # self.cromossomo[i] = '0'
+                # print("CROMO TESTE ", cromoTemp[i])
+                if cromoTemp[i] == 1:
+                    # print("IGUL 1")
+                    cromoTemp[i] = 0
                 else:
-                    print("IGUL 0")
-                    # self.cromossomo[i] = '1'
+                    # print("IGUL 0")
+                    cromoTemp[i] = 1
+        self.cromossomo = cromoTemp
+
         print("MUTACAO after %s" % self.cromossomo)
         return self
 
@@ -80,34 +93,12 @@ class AG():
 
     def inicializaPopulacao(self):
         for i in range(TAMANHOPOPULACAO):
-            cromossomo = ""
+            cromossomo = []
             for k in range(TAMANHOCROMOSSOMO):
-                cromossomo += str(random.randint(0,1))
+                # cromossomo += str(random.randint(0,1))
+                cromossomo.append(random.randint(0,1))
             self.populacao.append(Individuo(cromossomo))
             print("cromossomo gerado ", self.populacao[i].cromossomo)
-
-
-
-
-
-
-
-
-            # # numeroRand = randint(0, 99)
-            # # print(random.randrange(1, 5))
-            # numeroRand = round(random.uniform(-5.12, 5.12),14)
-            # print(numeroRand)
-            # # numeroRandBin = bin(struct.unpack('!i',struct.pack('!f',numeroRand))[0])
-            # numeroRandBin = format(struct.unpack('!I', struct.pack('!f', numeroRand))[0], '015b')
-            # print("NUM GERADO --> ", numeroRand)
-            # print("NUM gerado to BIN --> ", numeroRandBin)
-            # print("NUM BIN TO FLOAT --> ", struct.unpack('!f',struct.pack('!I', int(numeroRandBin, 2)))[0])
-            # # numeroRandBin = bin(numeroRand)[2:].zfill(15)
-            # # print("iiii -> ", i)
-            # # print("numRand -> ", numeroRand)
-            # # print("numRand -> ", numeroRandBin)
-            # self.populacao.append(Individuo(numeroRandBin))
-            # print("cromossomo -> ", self.populacao[i].cromossomo)
 
     def ordenaPopulacao(self):
         self.populacao = sorted(self.populacao, key=lambda populacao: populacao.notaFitness, reverse=False)
