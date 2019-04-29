@@ -4,11 +4,11 @@ import numpy as np
 import math
 
 CORTE = 1
-TAXAMUTACAO = 0.33
+TAXAMUTACAO = 0.05
 QTDGENESES = 3
 TAMANHOCROMOSSOMO = 3
 TAMANHOPOPULACAO = 4
-PROBALIDIDADEMUTACAO = 0.01
+# PROBALIDIDADEMUTACAO = 0.01
 
 NUMEROGERACOES = 100
 
@@ -20,7 +20,7 @@ class Genese():
 class Individuo():
     def __init__(self, valores, geracao=0):
         # self.nunGeneses = nunGeneses
-        self.valores = valores
+        # self.valores = valores
         self.geracao = geracao
         self.notaAvaliacao = 0
         self.cromossomo = []
