@@ -18,18 +18,25 @@ class Genese():
         self.valorGenese = valorGenese
 
 class Individuo():
-    def __init__(self, valores, geracao=0):
+    def __init__(self, listaGeneses = [],
+                 # valores,
+                 geracao=0):
         # self.nunGeneses = nunGeneses
         # self.valores = valores
         self.geracao = geracao
         self.notaAvaliacao = 0
         self.cromossomo = []
 
-        for i in range(0,TAMANHOCROMOSSOMO):
-            if random() < 0.5:
-                self.cromossomo.append(0)
-            else:
-                self.cromossomo.append(1)
+        # for i in range(0,TAMANHOCROMOSSOMO):
+        #     if random() < 0.5:
+        #         self.cromossomo.append(0)
+        #     else:
+        #         self.cromossomo.append(1)
+
+        print("listaGeneses", listaGeneses)
+
+        for i in range(len(listaGeneses)):
+            self.cromossomo.append(listaGeneses[i])
         print("cromossomo = %s" % (self.cromossomo))
 
     def avaliacao(self): #FITNESS
@@ -39,7 +46,7 @@ class Individuo():
 
             # print("avaliacao valor = %s" % (self.valores[i]))
 
-            nota = abs(((2 * self.valores[i]) + (self.valores[i] ** 2) + self.valores[i]) - 52)
+            nota = abs(((2 * self.cromossomo[i]) + (self.cromossomo[i] ** 2) + self.cromossomo[i]) - 52)
         self.notaAvaliacao = nota
 
     def crossover(self, outroIndividuo):
@@ -49,8 +56,8 @@ class Individuo():
         filho2 = self.cromossomo[0:corte] + outroIndividuo.cromossomo[corte::]
 
         filhos = [
-            Individuo(self.valores, self.geracao + 1),
-            Individuo(self.valores, self.geracao + 1)
+            Individuo([],self.geracao + 1),
+            Individuo([],self.geracao + 1)
         ]
         filhos[0].cromossomo = filho1
         filhos[1].cromossomo = filho2
@@ -60,11 +67,12 @@ class Individuo():
     def mutacao(self, taxaMutacao): #mutaOsFilhos
         print("before mutacao - %s" % (self.cromossomo))
         for i in range(len(self.cromossomo)):
-            if random() < taxaMutacao:
-                if self.cromossomo == 1:
-                    self.cromossomo[i] = 0
-                else:
-                    self.cromossomo[i] = 1
+            if randint(0,1) > taxaMutacao:
+                self.cromossomo[i] = randint(0,9)
+                # if self.cromossomo == 1:
+                #     self.cromossomo[i] = 0
+                # else:
+                #     self.cromossomo[i] = 1
         print("after mutacao - %s " % (self.cromossomo))
         return self
 
@@ -78,7 +86,7 @@ class AlgoritimoGenerito(): #populacao
 
     def inicializaPopulacao(self):
 
-        for i in range(self.tamanhoPopulacao):
+        for i in range(TAMANHOPOPULACAO):
             listaGeneses = []
             for y in range(0, QTDGENESES):
                 listaGeneses.append(randint(0, 9))
@@ -100,13 +108,12 @@ class AlgoritimoGenerito(): #populacao
 
     def selecionaPai(self, somaAvaliacao): #ROLETA
         pai = -1
-        valorSorteado = random() * somaAvaliacao
-
-
+        # valorSorteado = random() * somaAvaliacao
+        valorSorteado = randint(1,3)
         soma = 0
         i = 0
         while i < len(self.populacao) and soma < valorSorteado:
-            soma += self.populacao[i].notaAvaliacao
+            soma += 1
             pai += 1
             i += 1
         return pai
@@ -140,7 +147,11 @@ class AlgoritimoGenerito(): #populacao
                 pai1 = self.selecionaPai(somaAvaliacao)
                 pai2 = self.selecionaPai(somaAvaliacao)
 
+                print("pai1 %s | pai2 %s " % (pai1, pai2))
+
                 filhos = self.populacao[pai1].crossover(self.populacao[pai2])
+
+                print("populacaoPai1 ", self.populacao[pai1])
 
                 novaPopulacao.append(filhos[0].mutacao(taxaMutacao))
                 novaPopulacao.append(filhos[1].mutacao(taxaMutacao))
@@ -166,72 +177,8 @@ class AlgoritimoGenerito(): #populacao
 
 
 if __name__ == '__main__':
-    # listaGeneses = []
-    # for i in range(0, QTDGENESES):
-    #     listaGeneses.append(randint(0,9))
-    # print("Geneses gerados randomicamente --> %s \n" % (listaGeneses) )
 
-    # individuo1 = Individuo(listaGeneses)
-    # print("valores geneses %s " % (individuo1.valores))
-    # print("valores cromossomo %s " % (individuo1.cromossomo))
-    # individuo1.avaliacao()
-    # print("nota avaliacao(fitness) = %s " % (individuo1.notaAvaliacao))
-    #
-    # listaGeneses2 = []
-    # for i in range(0, QTDGENESES):
-    #     listaGeneses2.append(randint(0,9))
-    # individuo2 = Individuo(listaGeneses)
-    # individuo1.crossover(individuo2)
-    #
-    # individuo1.mutacao(TAXAMUTACAO)
-    # individuo2.mutacao(TAXAMUTACAO)
-
-
-#----------------
     algotimoGenetico = AlgoritimoGenerito(TAMANHOPOPULACAO)
-
-    # algotimoGenetico.inicializaPopulacao()
-    #
-    # for individuo in algotimoGenetico.populacao:
-    #     individuo.avaliacao()
-    #
-    # algotimoGenetico.ordenaPopulacao()
-    # algotimoGenetico.melhorIndiviuo(algotimoGenetico.populacao[0]) #melhorInidividuosEstaOrdenadoPosicaoZero
-    # for i in range(algotimoGenetico.tamanhoPopulacao):
-    #     print("*** inidivudo %s ****" % i,
-    #           "Valores %s " % str(algotimoGenetico.populacao[i].valores),
-    #           "cromossomo %s " % str(algotimoGenetico.populacao[i].cromossomo),
-    #           "fitness  %s " % str(algotimoGenetico.populacao[i].notaAvaliacao))
-    #
-    # print("MELHOR SOLUCAO %s " % algotimoGenetico.melhorSolucao.cromossomo,
-    #       "nota = %s " % algotimoGenetico.melhorSolucao.notaAvaliacao)
-    #
-    # soma = algotimoGenetico.somaAvaliacoes()
-    # print("somaAvaliacoes = %s" % soma)
-    # novaPopulacao = []
-    #
-    # for individuosGerados in range(0, algotimoGenetico.tamanhoPopulacao, 2):
-    #     pai1 = algotimoGenetico.selecionaPai(soma)
-    #     pai2 = algotimoGenetico.selecionaPai(soma)
-    #
-    #     filhos = algotimoGenetico.populacao[pai1].crossover(algotimoGenetico.populacao[pai2])
-    #     novaPopulacao.append(filhos[0].mutacao(PROBALIDIDADEMUTACAO))
-    #     novaPopulacao.append(filhos[1].mutacao(PROBALIDIDADEMUTACAO))
-    #
-    #
-    # print("pai 1 -> %s " % pai1)
-    # print("pai 2 -> %s " % pai2)
-    #
-    # algotimoGenetico.populacao = list(novaPopulacao)
-    # for individuo in algotimoGenetico.populacao:
-    #     individuo.avaliacao()
-    # algotimoGenetico.ordenaPopulacao()
-    # algotimoGenetico.melhorIndiviuo(algotimoGenetico.populacao[0])
-    # soma = algotimoGenetico.somaAvaliacoes()
-    #
-    # print("Melhor %s " % algotimoGenetico.melhorSolucao.cromossomo,
-    #       "Valor %s " % algotimoGenetico.melhorSolucao.notaAvaliacao)
-
 
     resultado = algotimoGenetico.resolver(TAXAMUTACAO, NUMEROGERACOES)
 
